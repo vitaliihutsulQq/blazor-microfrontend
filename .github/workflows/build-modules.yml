@@ -1,0 +1,28 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Build and Deploy Modules
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "Modules/**"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install .NET SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Build all modules
+        run: dotnet build Modules/**/*.csproj --configuration Release
+
+      - name: Deploy to BlazorHost
+        run: cp Modules/**/bin/Release/net8.0/*.dll BlazorHost/wwwroot/dynamic/
