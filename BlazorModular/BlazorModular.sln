@@ -1,0 +1,47 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35707.178
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorHost", "BlazorHost\BlazorHost.csproj", "{8C6D4FDA-0A87-435D-9143-F7DAD5A26943}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackendAPI", "BackendAPI\BackendAPI.csproj", "{9E722B52-6B1B-4858-BB12-59D0A63E0963}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{90DC96FA-C8CC-4F14-9082-A388C1D0BD79}"
+	ProjectSection(SolutionItems) = preProject
+		CreateModule.sh = CreateModule.sh
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TemplateModule", "TemplateModule\TemplateModule.csproj", "{731F9E19-03FF-401E-8EBC-9B2D0950D4AE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C3F591D7-FEA0-41E0-8458-1F9731B1DD63}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8C6D4FDA-0A87-435D-9143-F7DAD5A26943}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C6D4FDA-0A87-435D-9143-F7DAD5A26943}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C6D4FDA-0A87-435D-9143-F7DAD5A26943}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C6D4FDA-0A87-435D-9143-F7DAD5A26943}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9E722B52-6B1B-4858-BB12-59D0A63E0963}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9E722B52-6B1B-4858-BB12-59D0A63E0963}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9E722B52-6B1B-4858-BB12-59D0A63E0963}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9E722B52-6B1B-4858-BB12-59D0A63E0963}.Release|Any CPU.Build.0 = Release|Any CPU
+		{731F9E19-03FF-401E-8EBC-9B2D0950D4AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{731F9E19-03FF-401E-8EBC-9B2D0950D4AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{731F9E19-03FF-401E-8EBC-9B2D0950D4AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{731F9E19-03FF-401E-8EBC-9B2D0950D4AE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{731F9E19-03FF-401E-8EBC-9B2D0950D4AE} = {90DC96FA-C8CC-4F14-9082-A388C1D0BD79}
+	EndGlobalSection
+EndGlobal

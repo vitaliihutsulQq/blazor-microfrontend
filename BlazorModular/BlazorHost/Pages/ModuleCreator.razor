@@ -1,0 +1,36 @@
+﻿@page "/create-module"
+@inject HttpClient Http
+
+<h3>Create new module</h3>
+<div>
+    <label>Module name:</label>
+    <input @bind="ModuleName" class="form-control" />
+
+    <label>Description:</label>
+    <textarea @bind="Description" class="form-control"></textarea>
+    <button class="btn btn-primary" @onclick="CreateModule">Create</button>
+</div>
+
+@code {
+    private string ModuleName;
+    private string Description;
+    private string Message;
+
+    private async Task CreateModule()
+    {
+        var response = await Http.PostAsJsonAsync("https://localhost:5001/api/modules/create", new
+        {
+            moduleName = ModuleName,
+            description = Description
+        });
+
+        if (response.IsSuccessStatusCode)
+        {
+            Message = "Module succefull created!";
+        }
+        else
+        {
+            Message = "Error while creating new module :(";
+        }
+    }
+}
