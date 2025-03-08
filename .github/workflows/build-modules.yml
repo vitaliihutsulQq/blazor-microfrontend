@@ -6,23 +6,32 @@ on:
   push:
     branches:
       - main
-    paths:
-      - "Modules/**"
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Install .NET SDK
+      - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: 8.0.x
+          dotnet-version: '8.0'
 
-      - name: Build all modules
-        run: dotnet build Modules/**/*.csproj --configuration Release
+      - name: Restore dependencies
+        run: dotnet restore
 
-      - name: Deploy to BlazorHost
-        run: cp Modules/**/bin/Release/net8.0/*.dll BlazorHost/wwwroot/dynamic/
+      - name: Build All Modules
+        run: dotnet build --configuration Release
+
+      - name: Copy DLLs to BackendAPI/wwwroot/dynamic
+        run: |
+          mkdir -p BackendAPI/wwwroot/dynamic
+          cp Modules/*/bin/Release/net8.0/*.dll BackendAPI/wwwroot/dynamic/
+
+      - name: Deploy to Server (if needed)
+        run: |
+          echo "Deploying to server..."
+          # Put here SCP, FTP or command of deploy
