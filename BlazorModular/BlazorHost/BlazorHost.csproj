@@ -9,11 +9,10 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.12" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.12" PrivateAssets="all" />
+    <PackageReference Include="Radzen.Blazor" Version="6.2.4" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\TemplateModule\TemplateModule.csproj" />
-  </ItemGroup>
+  
 	<ItemGroup>
 		<PackageReference Include="System.Diagnostics.Process" />
 	</ItemGroup>

@@ -1,4 +1,5 @@
-﻿@inherits LayoutComponentBase
+﻿@using BlazorHost.Pages
+@inherits LayoutComponentBase
 <div class="page">
     <div class="sidebar">
         <NavMenu />
@@ -11,6 +12,11 @@
 
         <article class="content px-4">
             @Body
+           
         </article>
     </main>
 </div>
+<HeadContent>
+    <RadzenTheme Theme="material" />
+</HeadContent>
+<RadzenComponents />

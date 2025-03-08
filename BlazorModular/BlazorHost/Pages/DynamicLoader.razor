@@ -1,0 +1,154 @@
+﻿@page "/dynamic-loader"
+@inject HttpClient Http
+@inject LazyAssemblyLoader AssemblyLoader
+@inject DynamicModuleService ModuleService
+@using System.Reflection
+@using BlazorHost.Services
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.WebAssembly.Services
+
+
+<h3>Dynamic module loader</h3>
+
+
+@if (modulesList is null)
+{
+    <p>Loading list of modules...</p>
+}
+else
+{
+    <RadzenListBox @bind-Value="selectedModule" Data="modulesList" Style="width: 300px; height: 200px" />
+    <br />
+    <RadzenButton Text="Load Module" Click="LoadModuleFromServiceByName" Disabled="@string.IsNullOrEmpty(selectedModule)" Style="margin-top: 10px;" />
+
+    @*     <button class="btn btn-primary mt-2" @onclick="LoadComponent" disabled="@(string.IsNullOrEmpty(selectedModule))">
+        Загрузить модуль
+    </button> *@
+
+}
+
+@if (loadedComponent != null)
+{
+    @try
+    {
+        <p><strong>Loaded Component:</strong> @loadedComponent.FullName</p>
+        <DynamicComponent Type="loadedComponent" Parameters="componentParameters" />
+
+    }
+    catch (Exception ex)
+    {
+        <p style="color: red;">Error UI rendering: @ex.Message</p>
+        Console.WriteLine($"Error UI rendering: {ex.Message}");
+    }
+}
+
+@code {
+    private Type loadedComponent;
+    private IDictionary<string, object> componentParameters;
+    private List<string> modulesList;
+    private string selectedModule;
+    private List<Assembly> lazyLoadedAssemblies = [];
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        await LoadModulesList();
+    }
+
+    private async Task LoadComponent()
+    {
+        if (string.IsNullOrEmpty(selectedModule))
+            return;
+
+
+        var moduleUrl = $"{AppConfig.ApiBaseUrl()}/api/ModulesApi/get/{selectedModule}.dll";
+
+        try
+        {
+            Console.WriteLine($"Loading module: {moduleUrl}");
+
+            var assemblyBytes = await Http.GetByteArrayAsync(moduleUrl);
+
+            if (assemblyBytes is null || assemblyBytes.Length == 0)
+            {
+                Console.WriteLine("Error: The downloaded module is empty.");
+                return;
+            }
+
+            Console.WriteLine($"Module size: {assemblyBytes.Length} bytes");
+
+            // Load the assembly into memory
+            var assembly = Assembly.Load(assemblyBytes);
+            Console.WriteLine($"Module {selectedModule} loaded into memory.");
+
+            // Output a list of available types (for debugging)
+            Console.WriteLine("Available types in assembly:");
+            foreach (var type in assembly.GetTypes())
+            {
+                Console.WriteLine($"{type.FullName}");
+            }
+
+            // Define the full component path
+            var componentFullName = $"{selectedModule}.Components.{selectedModule}Component";
+            loadedComponent = assembly.GetType(componentFullName);
+
+            if (loadedComponent == null)
+            {
+                Console.WriteLine($"Error: Component {componentFullName} not found in assembly.");
+                return;
+            }
+
+            // Check if the found type is a Blazor component
+            if (!typeof(ComponentBase).IsAssignableFrom(loadedComponent))
+            {
+                Console.WriteLine($"Error: {componentFullName} is not a Blazor component.");
+                return;
+            }
+
+            Console.WriteLine($"Component {componentFullName} successfully found and loaded.");
+
+            // Pass parameters to the component
+            componentParameters = new Dictionary<string, object>
+                {
+                    { "Message", $"Dynamic component {selectedModule} loaded!" }
+                };
+
+            InvokeAsync(StateHasChanged);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading module: {ex.Message}");
+        }
+    }
+
+    private async Task LoadModulesList()
+    {
+        try
+        {
+            modulesList = await Http.GetFromJsonAsync<List<string>>($"{AppConfig.ApiBaseUrl()}/api/ModulesApi/list");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading list of modules: {ex.Message}");
+        }
+    }
+
+    private async Task LoadModuleFromServiceByName()
+    {
+        if (string.IsNullOrEmpty(selectedModule))
+            return;
+
+        loadedComponent = await ModuleService.GetComponentAsync(selectedModule);
+
+        if (loadedComponent != null)
+        {
+            componentParameters = new Dictionary<string, object>
+            {
+                { "Message", $"Hello from {selectedModule}!" }
+            };
+        }
+
+        StateHasChanged();
+    }
+}

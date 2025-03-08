@@ -18,7 +18,7 @@
 
     private async Task CreateModule()
     {
-        var response = await Http.PostAsJsonAsync("https://localhost:5001/api/modules/create", new
+        var response = await Http.PostAsJsonAsync($"{AppConfig.ApiBaseUrl()}/api/ModulesApi/create", new
         {
             moduleName = ModuleName,
             description = Description
