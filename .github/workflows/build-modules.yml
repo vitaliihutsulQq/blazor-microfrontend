@@ -7,7 +7,7 @@ on:
     branches:
       - main
     paths:
-      - "Modules/**"  # Запускаем, если изменилось что-то в папке Modules/
+      - "Modules/**/*" 
 
 jobs:
   build:
