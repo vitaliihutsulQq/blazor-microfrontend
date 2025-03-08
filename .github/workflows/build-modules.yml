@@ -31,7 +31,7 @@ jobs:
       - name: Copy DLLs to BackendAPI/wwwroot/dynamic
         run: |
           mkdir -p BackendAPI/wwwroot/dynamic
-          cp Modules/*/bin/Release/net8.0/*.dll BackendAPI/wwwroot/dynamic/
+          cp Modules/*/bin/Release/net9.0/*.dll BackendAPI/wwwroot/dynamic/
 
       - name: Deploy to Server (if needed)
         run: |
