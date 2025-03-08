@@ -8,7 +8,8 @@ on:
     branches:
       - main
     paths:
-      - "Modules/**/*"   
+      - "Modules/**/*"
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -25,28 +26,13 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
 
+    - name: Build all modules
+      run: dotnet build Modules/**/*.csproj --configuration Release
 
-    - name: Find changed modules
-      id: find_modules
+    - name: Copy DLLs to BackendAPI/wwwroot/dynamic
       run: |
-        CHANGED_MODULES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^Modules/' | cut -d '/' -f2 | sort -u)
-        echo "Found modules: $CHANGED_MODULES"
-        echo "modules=$CHANGED_MODULES" >> $GITHUB_ENV
+        mkdir -p BackendAPI/wwwroot/dynamic
+        cp Modules/*/bin/Release/net8.0/*.dll BackendAPI/wwwroot/dynamic/
 
-    # 🔨 
-    - name: Build changed modules
-      run: |
-        for module in ${{ env.modules }}; do
-          echo "Building module: $module"
-          dotnet build Modules/$module/*.csproj --configuration Release
-        done
-      if: env.modules != ''
-
-    # 🚀 
     - name: Deploy to BlazorHost
-      run: |
-        mkdir -p BlazorHost/wwwroot/dynamic
-        for module in ${{ env.modules }}; do
-          cp Modules/$module/bin/Release/net8.0/*.dll BlazorHost/wwwroot/dynamic/
-        done
-      if: env.modules != ''
+      run: cp Modules/**/bin/Release/net8.0/*.dll BlazorHost/wwwroot/dynamic/
