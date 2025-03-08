@@ -7,11 +7,12 @@ on:
     branches:
       - main
     paths:
-      - "Modules/**"
+      - "Modules/**"  # Запускаем, если изменилось что-то в папке Modules/
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -21,8 +22,28 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
-      - name: Build all modules
-        run: dotnet build Modules/**/*.csproj --configuration Release
+      - name: Restore dependencies
+        run: dotnet restore
 
-      - name: Deploy to BlazorHost
-        run: cp Modules/**/bin/Release/net8.0/*.dll BlazorHost/wwwroot/dynamic/
+      - name: Find changed modules
+        id: find_modules
+        run: |
+          CHANGED_MODULES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^Modules/' | cut -d '/' -f2 | sort -u)
+          echo "Found modules: $CHANGED_MODULES"
+          echo "modules=$CHANGED_MODULES" >> $GITHUB_ENV
+
+      - name: Build changed modules
+        run: |
+          for module in ${{ env.modules }}; do
+            echo "Building module: $module"
+            dotnet build Modules/$module/*.csproj --configuration Release
+          done
+        if: env.modules != ''
+
+      - name: Copy DLLs to BlazorHost/wwwroot/dynamic
+        run: |
+          mkdir -p BlazorHost/wwwroot/dynamic
+          for module in ${{ env.modules }}; do
+            cp Modules/$module/bin/Release/net8.0/*.dll BlazorHost/wwwroot/dynamic/
+          done
+        if: env.modules != ''
