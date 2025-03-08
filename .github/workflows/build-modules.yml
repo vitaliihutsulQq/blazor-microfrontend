@@ -7,32 +7,32 @@ on:
   push:
     branches:
       - main
-    paths:
-      - "Modules/**/*"
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 8.0.x
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0'
 
-    - name: Restore dependencies
-      run: dotnet restore
+      - name: Restore dependencies
+        run: dotnet restore
 
-    - name: Build all modules
-      run: dotnet build Modules/**/*.csproj --configuration Release
+      - name: Build All Modules
+        run: dotnet build --configuration Release
 
-    - name: Copy DLLs to BackendAPI/wwwroot/dynamic
-      run: |
-        mkdir -p BackendAPI/wwwroot/dynamic
-        cp Modules/*/bin/Release/net8.0/*.dll BackendAPI/wwwroot/dynamic/
+      - name: Copy DLLs to BackendAPI/wwwroot/dynamic
+        run: |
+          mkdir -p BackendAPI/wwwroot/dynamic
+          cp Modules/*/bin/Release/net8.0/*.dll BackendAPI/wwwroot/dynamic/
 
-    - name: Deploy to BlazorHost
-      run: cp Modules/**/bin/Release/net8.0/*.dll BlazorHost/wwwroot/dynamic/
+      - name: Deploy to Server (if needed)
+        run: |
+          echo "Deploying to server..."
+          # Put here SCP, FTP or command of deploy
