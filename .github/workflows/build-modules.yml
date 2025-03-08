@@ -7,56 +7,52 @@ on:
   push:
     branches:
       - main
-    paths:
-      - "Modules/**"
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 8.0.x
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0'
 
-    - name: Restore dependencies
-      run: dotnet restore BlazorModular.sln
+      - name: Restore dependencies
+        run: dotnet restore BlazorModular/BlazorModular.sln
+        
 
+      - name: Build All Modules
+        run: dotnet build BlazorModular/BlazorModular.sln --configuration Release
 
-    - name: Find changed modules
-      id: find_modules
-      run: |
-        CHANGED_MODULES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^Modules/' | cut -d '/' -f2 | sort -u)
-        echo "Found modules: $CHANGED_MODULES"
-        echo "modules=$CHANGED_MODULES" >> $GITHUB_ENV
-
-
-    - name: Build changed modules
-      run: |
-        for module in ${{ env.modules }}; do
-          echo "Building module: $module"
-          dotnet build Modules/$module/*.csproj --configuration Release
-        done
-      if: env.modules != ''
+      - name: Find changed modules
+        id: find_modules
+        run: |
+            CHANGED_MODULES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^Modules/' | cut -d '/' -f2 | sort -u)
+            echo "Found modules: $CHANGED_MODULES"
+            echo "modules=$CHANGED_MODULES" >> $GITHUB_ENV
 
 
-    - name: Copy DLLs to BackendAPI/wwwroot/dynamic
-      run: |
-        mkdir -p BlazorModular/BackendAPI/wwwroot/dynamic
-        for module in ${{ env.modules }}; do
-          cp Modules/$module/bin/Release/net9.0/*.dll BlazorModular/BackendAPI/wwwroot/dynamic/
-        done
-      if: env.modules != ''
+      - name: Build changed modules
+        run: |
+            for module in ${{ env.modules }}; do
+              echo "Building module: $module"
+              dotnet build Modules/$module/*.csproj --configuration Release
+            done
+        if: env.modules != ''
 
+      - name: Copy DLLs to BackendAPI/wwwroot/dynamic
+        run: |
+            mkdir -p BlazorModular/BackendAPI/wwwroot/dynamic
+            for module in ${{ env.modules }}; do
+             cp Modules/$module/bin/Release/net9.0/*.dll BlazorModular/BackendAPI/wwwroot/dynamic/
+            done
+            if: env.modules != ''
 
-    - name: Deploy to BlazorHost
-      run: |
-        mkdir -p BlazorModular/BlazorHost/wwwroot/dynamic
-        for module in ${{ env.modules }}; do
-          cp Modules/$module/bin/Release/net9.0/*.dll BlazorModular/BlazorHost/wwwroot/dynamic/
-        done
-      if: env.modules != ''
+      - name: Deploy to Server (if needed)
+        run: |
+          echo "Deploying to server..."
+          # Put here SCP, FTP or command of deploy
