@@ -22,7 +22,7 @@ jobs:
           dotnet-version: '8.0'
 
       - name: Restore dependencies
-        run: dotnet restore BlazorModular.sln
+        run: dotnet restore BlazorModular/BlazorModular.sln
         
 
       - name: Build All Modules
