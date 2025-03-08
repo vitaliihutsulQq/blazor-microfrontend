@@ -26,7 +26,7 @@ jobs:
         
 
       - name: Build All Modules
-        run: dotnet build --configuration Release
+        run: dotnet build BlazorModular/BlazorModular.sln --configuration Release
 
       - name: Copy DLLs to BackendAPI/wwwroot/dynamic
         run: |
