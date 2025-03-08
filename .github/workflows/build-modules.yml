@@ -18,19 +18,28 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '9.0.x' 
+          dotnet-version: '9.0.x'  
 
-      - name: Restore Dependencies
-        run: dotnet restore BlazorModular/BlazorModular.sln
+      - name: Restore Dependencies for Solution
+        run: dotnet restore BlazorModular/BlazorModular.sln  
+
+      - name: Restore Dependencies for All Modules
+        run: |
+          for csproj in $(find BlazorModular/Modules -name "*.csproj"); do
+            echo "Restoring dependencies for $csproj..."
+            dotnet restore "$csproj"
+          done
 
       - name: Build Backend API
         run: dotnet build BlazorModular/BackendAPI/BackendAPI.csproj --configuration Release --no-restore
 
-      - name: Find and Build All Modules
+      - name: Build All Modules
         run: |
           for csproj in $(find BlazorModular/Modules -name "*.csproj"); do
             echo "Building $csproj..."
