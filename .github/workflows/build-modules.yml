@@ -25,7 +25,7 @@ jobs:
           dotnet-version: '8.0.x' 
 
       - name: Restore Dependencies
-        run: dotnet restore
+        run: dotnet restore BlazorModular.sln
 
       - name: Build Backend API
         run: dotnet build BlazorModular/BackendAPI/BackendAPI.csproj --configuration Release --no-restore
