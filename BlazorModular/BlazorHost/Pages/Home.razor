@@ -2,8 +2,51 @@
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<RadzenCard Style="padding: 20px; max-width: 1200px; margin: 50px;">
+    <RadzenRow>
+        <RadzenColumn Size="12">
+            <RadzenHeading Size="H1">🚀 BlazorModular – Модульное Blazor-приложение</RadzenHeading>
+            <p>
+                BlazorModular – это гибкое и масштабируемое приложение, предназначенное для управления UI-компонентами через модульную архитектуру.
+            </p>
+        </RadzenColumn>
+    </RadzenRow>
 
-Welcome to your new app.
+    <RadzenRow>
 
-<DynamicLoader />
+        <!-- Описание Модульной системы -->
+        <RadzenColumn Size="4">
+            <RadzenCard Style="background: #154c79; color: white; margin-top: 20px; margin-bottom: 20px;">
+                <RadzenHeading Size="H2">🔧 Модульная система</RadzenHeading>
+                <p>Гибкое добавление UI-компонентов без пересборки.</p>
+                <RadzenButton Text="Перейти" Click="@(()=>Navigation.NavigateTo("/create-module"))" Style="background: white; color: #154c79;" />
+            </RadzenCard>
+        </RadzenColumn>
+
+    </RadzenRow>
+
+
+    <RadzenRow>
+        <RadzenColumn Size="6">
+            <RadzenHeading Size="H3">🔹 Основные возможности</RadzenHeading>
+            <ul>
+                <li>✅ Динамическое управление модулями.</li>
+                <li>✅ Разделение API и UI-компонентов.</li>
+                <li>✅ Гибкость и масштабируемость.</li>
+            </ul>
+        </RadzenColumn>
+
+        <RadzenColumn Size="6">
+            <RadzenHeading Size="H3">🌍 Где можно использовать?</RadzenHeading>
+            <ul>
+                <li>📌 Динамически изменяемые UI-приложения.</li>
+            </ul>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenCard>
+
+
+@code {
+    @inject NavigationManager Navigation
+
+}

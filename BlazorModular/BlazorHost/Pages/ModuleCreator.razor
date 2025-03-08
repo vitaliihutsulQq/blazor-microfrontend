@@ -1,36 +1,108 @@
 ﻿@page "/create-module"
 @inject HttpClient Http
 
-<h3>Create new module</h3>
+
+
 <div>
-    <label>Module name:</label>
-    <input @bind="ModuleName" class="form-control" />
+    <RadzenCard>
+        <RadzenRow Style="margin-bottom: 20px;">
+            <RadzenColumn Size="12">
+                <RadzenHeading Size="H1"></RadzenHeading>
+                <p>Create new module</p>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">ModuleName</RadzenText>
+        <RadzenTextBox @bind-Value="ModuleName" @oninput=@OnInput Style="width: 100%; margin-bottom: 20px;" aria-label="Default TextBox" />
 
-    <label>Description:</label>
-    <textarea @bind="Description" class="form-control"></textarea>
-    <button class="btn btn-primary" @onclick="CreateModule">Create</button>
+        <RadzenTextArea Value="@Description" @oninput=@OnChangeTextAreaInput Placeholder="Description..." Style="width: 100%" aria-label="TextArea with placeholder" />
+
+        <RadzenButton Disabled="@(IsButtonDisabled || IsLoading)" Click="@CreateModule" Style="margin-top: 10px;">
+
+            @if (IsLoading)
+            {
+                <span style="margin-left: 10px;">Processing...</span>
+            }
+            else
+            {
+                <span>Create</span>
+            }
+        </RadzenButton>
+    </RadzenCard>
+
+    <RadzenAlert Visible="@ShowSuccessAlert" AlertStyle="AlertStyle.Success" Variant="Variant.Flat" Shade="Shade.Lighter" Text="Module successfully created!" />
+    <RadzenAlert Visible="@ShowErrorAlert" AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter" Text="Failed to create module. Please try again." />
 </div>
-
 @code {
     private string ModuleName;
     private string Description;
     private string Message;
+    private bool IsButtonDisabled => string.IsNullOrWhiteSpace(ModuleName) || string.IsNullOrWhiteSpace(Description);
+    private bool ShowSuccessAlert { get; set; } = false;
+    private bool ShowErrorAlert { get; set; } = false;
+    private bool IsLoading { get; set; } = false;
 
-    private async Task CreateModule()
+    void OnInput(ChangeEventArgs e)
     {
-        var response = await Http.PostAsJsonAsync($"{AppConfig.ApiBaseUrl()}/api/ModulesApi/create", new
-        {
-            moduleName = ModuleName,
-            description = Description
-        });
 
-        if (response.IsSuccessStatusCode)
+        string input = e.Value?.ToString() ?? string.Empty;
+
+        if (!string.IsNullOrWhiteSpace(input))
         {
-            Message = "Module succefull created!";
+            ModuleName = char.ToUpper(input[0]) + input.Substring(1);
         }
         else
         {
-            Message = "Error while creating new module :(";
+            ModuleName = input;
+        }
+        StateHasChanged();
+    }
+
+    void OnChangeTextAreaInput(ChangeEventArgs e)
+    {
+        Description = e.Value?.ToString() ?? string.Empty;
+        
+    }
+
+    private async Task CreateModule()
+    {
+        if (IsLoading) return;
+        try
+        {
+            IsLoading = true;
+            StateHasChanged();
+
+            await Task.Delay(500);
+
+            var response = await Http.PostAsJsonAsync($"{AppConfig.ApiBaseUrl()}/api/ModulesApi/create", new
+            {
+                moduleName = ModuleName,
+                description = Description
+            });
+
+            if (response.IsSuccessStatusCode)
+            {
+                Message = "Module successfully created!";
+                ShowSuccessAlert = true;
+                ShowErrorAlert = false;
+            }
+            else
+            {
+                Message = "Error while creating new module :(";
+                ShowSuccessAlert = false;
+                ShowErrorAlert = true;
+            }
+        }
+        catch (Exception)
+        {
+            Message = "An unexpected error occurred.";
+            ShowSuccessAlert = false;
+            ShowErrorAlert = true;
+        }
+        finally
+        {
+            IsLoading = false;
+            StateHasChanged();
         }
     }
 }
+
