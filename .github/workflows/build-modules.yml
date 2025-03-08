@@ -1,4 +1,5 @@
-# This is a basic workflow to help you get started with Actions
+# This workflow will build a .NET project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
 
 name: Build and Deploy Modules
 
@@ -7,43 +8,45 @@ on:
     branches:
       - main
     paths:
-      - "Modules/**/*" 
-
+      - "Modules/**/*"   
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-      - name: Install .NET SDK
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: 8.0.x
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
 
-      - name: Restore dependencies
-        run: dotnet restore
+    - name: Restore dependencies
+      run: dotnet restore
 
-      - name: Find changed modules
-        id: find_modules
-        run: |
-          CHANGED_MODULES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^Modules/' | cut -d '/' -f2 | sort -u)
-          echo "Found modules: $CHANGED_MODULES"
-          echo "modules=$CHANGED_MODULES" >> $GITHUB_ENV
 
-      - name: Build changed modules
-        run: |
-          for module in ${{ env.modules }}; do
-            echo "Building module: $module"
-            dotnet build Modules/$module/*.csproj --configuration Release
-          done
-        if: env.modules != ''
+    - name: Find changed modules
+      id: find_modules
+      run: |
+        CHANGED_MODULES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^Modules/' | cut -d '/' -f2 | sort -u)
+        echo "Found modules: $CHANGED_MODULES"
+        echo "modules=$CHANGED_MODULES" >> $GITHUB_ENV
 
-      - name: Copy DLLs to BlazorHost/wwwroot/dynamic
-        run: |
-          mkdir -p BlazorHost/wwwroot/dynamic
-          for module in ${{ env.modules }}; do
-            cp Modules/$module/bin/Release/net8.0/*.dll BlazorHost/wwwroot/dynamic/
-          done
-        if: env.modules != ''
+    # 🔨 
+    - name: Build changed modules
+      run: |
+        for module in ${{ env.modules }}; do
+          echo "Building module: $module"
+          dotnet build Modules/$module/*.csproj --configuration Release
+        done
+      if: env.modules != ''
+
+    # 🚀 
+    - name: Deploy to BlazorHost
+      run: |
+        mkdir -p BlazorHost/wwwroot/dynamic
+        for module in ${{ env.modules }}; do
+          cp Modules/$module/bin/Release/net8.0/*.dll BlazorHost/wwwroot/dynamic/
+        done
+      if: env.modules != ''
