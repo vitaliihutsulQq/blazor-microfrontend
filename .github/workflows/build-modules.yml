@@ -24,7 +24,7 @@ jobs:
         run: dotnet restore
 
       - name: Build All Modules
-        run: dotnet build --configuration Release
+        run: dotnet build BlazorModular.sln --configuration Release
 
       - name: Copy DLLs to BackendAPI/wwwroot/dynamic
         run: |
