@@ -1,10 +1,13 @@
 # This workflow will build a .NET project
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
 
-name: Build and Deploy Modules
+name: Build and Deploy Blazor Modules
 
 on:
   push:
+    branches:
+      - main
+  pull_request:
     branches:
       - main
 
@@ -13,46 +16,39 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout Repository
         uses: actions/checkout@v3
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '8.0'
+          dotnet-version: '8.0.x' 
 
-      - name: Restore dependencies
-        run: dotnet restore BlazorModular/BlazorModular.sln
-        
+      - name: Restore Dependencies
+        run: dotnet restore
 
-      - name: Build All Modules
-        run: dotnet build BlazorModular/BlazorModular.sln --configuration Release
+      - name: Build Backend API
+        run: dotnet build BlazorModular/BackendAPI/BackendAPI.csproj --configuration Release --no-restore
 
-      - name: Find changed modules
-        id: find_modules
+      - name: Find and Build All Modules
         run: |
-            CHANGED_MODULES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^Modules/' | cut -d '/' -f2 | sort -u)
-            echo "Found modules: $CHANGED_MODULES"
-            echo "modules=$CHANGED_MODULES" >> $GITHUB_ENV
+          for csproj in $(find BlazorModular/Modules -name "*.csproj"); do
+            echo "Building $csproj..."
+            dotnet build "$csproj" --configuration Release --no-restore
+          done
 
+      - name: Create Dynamic Directory
+        run: mkdir -p BlazorModular/BackendAPI/wwwroot/dynamic
 
-      - name: Build changed modules
+      - name: Copy All Built Modules to Dynamic Folder
         run: |
-            for module in ${{ env.modules }}; do
-              echo "Building module: $module"
-              dotnet build Modules/$module/*.csproj --configuration Release
-            done
-        if: env.modules != ''
+          find BlazorModular/Modules -type f -name "*.dll" -path "*/bin/Release/*" -exec cp {} BlazorModular/BackendAPI/wwwroot/dynamic/ \;
 
-      - name: Copy DLLs to BackendAPI/wwwroot/dynamic
-        run: |
-            mkdir -p BlazorModular/BackendAPI/wwwroot/dynamic
-            for module in ${{ env.modules }}; do
-             cp Modules/$module/bin/Release/net9.0/*.dll BlazorModular/BackendAPI/wwwroot/dynamic/
-            done
-            if: env.modules != ''
+      - name: List Dynamic Folder Content (Debugging)
+        run: ls -la BlazorModular/BackendAPI/wwwroot/dynamic/
 
-      - name: Deploy to Server (if needed)
-        run: |
-          echo "Deploying to server..."
-          # Put here SCP, FTP or command of deploy
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: blazor-modules
+          path: BlazorModular/BackendAPI/wwwroot/dynamic/
