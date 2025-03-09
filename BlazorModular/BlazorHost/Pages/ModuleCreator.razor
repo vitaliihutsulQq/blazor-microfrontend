@@ -4,19 +4,19 @@
 
 
 <div>
-    <RadzenCard>
+    <RadzenCard Style="background: #f8f9fa; box-shadow: 0px 4px 6px rgba(0,0,0,0.1);">
         <RadzenRow Style="margin-bottom: 20px;">
             <RadzenColumn Size="12">
                 <RadzenHeading Size="H1"></RadzenHeading>
                 <p>Create new module</p>
             </RadzenColumn>
         </RadzenRow>
-        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">ModuleName</RadzenText>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Module Name</RadzenText>
         <RadzenTextBox @bind-Value="ModuleName" @oninput=@OnInput Style="width: 100%; margin-bottom: 20px;" aria-label="Default TextBox" />
-
+        <RadzenLabel Text="Module name contains invalid characters!" Style="color: red;" Visible="@ShowInvalidNameWarning"></RadzenLabel>
         <RadzenTextArea Value="@Description" @oninput=@OnChangeTextAreaInput Placeholder="Description..." Style="width: 100%" aria-label="TextArea with placeholder" />
 
-        <RadzenButton Disabled="@(IsButtonDisabled || IsLoading)" Click="@CreateModule" Style="margin-top: 10px;">
+        <RadzenButton Disabled="@(IsButtonDisabled || IsLoading || ShowInvalidNameWarning)" Click="@CreateModule" Style="margin-top: 10px;">
 
             @if (IsLoading)
             {
@@ -40,20 +40,23 @@
     private bool ShowSuccessAlert { get; set; } = false;
     private bool ShowErrorAlert { get; set; } = false;
     private bool IsLoading { get; set; } = false;
+    private bool ShowInvalidNameWarning { get; set; } = false;
 
     void OnInput(ChangeEventArgs e)
     {
 
         string input = e.Value?.ToString() ?? string.Empty;
 
-        if (!string.IsNullOrWhiteSpace(input))
+        if (System.Text.RegularExpressions.Regex.IsMatch(input, "[^a-zA-Z0-9_]") || string.IsNullOrWhiteSpace(input))
         {
-            ModuleName = char.ToUpper(input[0]) + input.Substring(1);
+            ShowInvalidNameWarning = true;
         }
         else
         {
-            ModuleName = input;
+            ShowInvalidNameWarning = false;
+            ModuleName = char.ToUpper(input[0]) + input.Substring(1);
         }
+
         StateHasChanged();
     }
 

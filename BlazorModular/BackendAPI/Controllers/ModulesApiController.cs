@@ -96,26 +96,7 @@ namespace BackendAPI.Controllers
                 Console.WriteLine($"❌ Exception: {ex.Message}");
                 return StatusCode(500, "An error occurred while creating the module.");
             }
-            //var scriptPath = "./Scripts/CreateModule.sh";
-            //var scriptPath = Path.Combine(Directory.GetCurrentDirectory(), "Scripts", "CreateModule.bat");
 
-            //var process = new Process
-            //{
-            //    StartInfo = new ProcessStartInfo
-            //    {
-            //        FileName = "cmd.exe",
-            //        Arguments = $"/C \"{scriptPath} {request.ModuleName}\"",
-            //        RedirectStandardOutput = true,
-            //        RedirectStandardError = true,
-            //        UseShellExecute = false,
-            //        CreateNoWindow = true
-            //    }
-            //};
-
-            //process.Start();
-            //await process.WaitForExitAsync();
-
-            //return Ok(new { Message = "Module succeful created!" });
         }
 
         [HttpGet("list")]
@@ -136,7 +117,7 @@ namespace BackendAPI.Controllers
             return Ok(moduleDirectories);
         }
 
-        [HttpGet("get/{moduleName}.dll")]
+        [HttpGet("get/{moduleName}")]
         public IActionResult GetModule(string moduleName)
         {
             var modulePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "dynamic", $"{moduleName}.dll");

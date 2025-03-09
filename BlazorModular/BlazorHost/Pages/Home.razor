@@ -2,12 +2,12 @@
 
 <PageTitle>Home</PageTitle>
 
-<RadzenCard Style="padding: 20px; max-width: 1200px; margin: 50px;">
+<RadzenCard Style="padding: 20px; max-width: 1200px; margin: 50px; background: #f8f9fa; box-shadow: 0px 4px 6px rgba(0,0,0,0.1);">
     <RadzenRow>
         <RadzenColumn Size="12">
             <RadzenHeading Size="H1">🚀 BlazorModular – Modular Blazor Application</RadzenHeading>
             <p>
-                BlazorModular is a flexible and scalable application framework designed to manage UI components through a modular architecture.
+                BlazorModular is a flexible and scalable application designed to manage UI components through a modular architecture.
             </p>
         </RadzenColumn>
     </RadzenRow>
@@ -19,7 +19,7 @@
             <RadzenCard Style="background: #154c79; color: white; margin-top: 20px; margin-bottom: 20px;">
                 <RadzenHeading Size="H2">🔧 Modular system</RadzenHeading>
                 <p>Flexible addition of UI components without rebuilding.</p>
-                <RadzenButton Text="Перейти" Click="@(()=>Navigation.NavigateTo("/create-module"))" Style="background: white; color: #154c79;" />
+                <RadzenButton Text="Create module" Click="@(()=>Navigation.NavigateTo("/create-module"))" Style="background: white; color: #154c79;" />
             </RadzenCard>
         </RadzenColumn>
 

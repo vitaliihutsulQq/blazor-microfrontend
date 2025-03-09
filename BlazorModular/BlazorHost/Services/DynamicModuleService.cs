@@ -14,7 +14,7 @@ namespace BlazorHost.Services
 
         public async Task<Type> GetComponentAsync(string moduleName)
         {
-            var moduleUrl = $"{_httpClient.BaseAddress}api/ModulesApi/get/{moduleName}.dll";
+            var moduleUrl = $"{_httpClient.BaseAddress}api/ModulesApi/get/{moduleName}";
 
             try
             {

@@ -8,7 +8,7 @@
 @using Microsoft.AspNetCore.Components.WebAssembly.Services
 
 
-<h3>Your modules list:</h3>
+<h3>List of your modules:</h3>
 
 
 @if (modulesList is null)
@@ -17,11 +17,18 @@
 }
 else
 {
-    <RadzenListBox @bind-Value="selectedModule" Data="modulesList" Style="width: 300px; height: 200px" />
+    <RadzenListBox @bind-Value="selectedModule"
+                   Data="modulesList"
+                   Style="width: 300px; height: 200px">
+        <Template Context="module">
+            <div style="display: flex; align-items: center;">
+                <RadzenIcon Icon="apps" Style="margin-right: 10px;" />
+                <span>@module</span>
+            </div>
+        </Template>
+    </RadzenListBox>
     <br />
     <RadzenButton Text="Load Module" Click="LoadModuleFromServiceByName" Disabled="@string.IsNullOrEmpty(selectedModule)" Style="margin-top: 10px;" />
-
-
 
 }
 
@@ -29,8 +36,12 @@ else
 {
     @try
     {
-        <p><strong>Loaded Component:</strong> @loadedComponent.FullName</p>
-        <DynamicComponent Type="loadedComponent" Parameters="componentParameters" />
+        <RadzenCard Style="padding: 20px; max-width: 600px; margin: auto; text-align: center; background: #f8f9fa; box-shadow: 0px 4px 6px rgba(0,0,0,0.1);">
+            <RadzenIcon Icon="check_circle" Style="color: green; font-size: 36px; margin-bottom: 10px;" />
+            <RadzenHeading Size="H3">✅ Loaded Component</RadzenHeading>
+            <RadzenText Style="font-size: 18px; font-weight: bold;">@loadedComponent.FullName</RadzenText>
+            <DynamicComponent Type="loadedComponent" Parameters="componentParameters" />
+        </RadzenCard>
 
     }
     catch (Exception ex)
